@@ -1,27 +1,27 @@
 var tasks, startHeight
 
-var taskCount = 20
+var taskCount = 50
 
-var orderForce = 0.5
-var friction = 0.96
-var orderDiscount = 0.1
+var orderForce = 0.8
+var friction = 0.7
+var orderDiscount = 0.05
 var edgeForce = 0.1
 var asapForce = 0.05
 
 var stepsPerFrame = 10
 
-var taskHeight = 20
+var taskHeight = 10
 var flagHeight = 15
 var flagWidth = 5
 var linkWidth = 2
 
-var minTaskWidth = 100
+var minTaskWidth = 50
 var maxTaskWidth = 100
 
 var maxConnections = 3
 
 function randColor() { 
-  return [random(255), random(255), random(255)] 
+  return [random(100,255), random(100,255), random(100,255)] 
 }
 
 function randomParents(j) {
@@ -39,7 +39,7 @@ function randomParents(j) {
 
 function randomTask(i) {
   return {
-      x: random(width), y: (random(-5, 10) | 0) * taskHeight,
+      x: random(0), y: (random(-5, 10) | 0) * taskHeight * 2,
       v: 0, w: random(minTaskWidth, maxTaskWidth),
       c: randColor(), parents: randomParents(i)
     }
@@ -93,7 +93,7 @@ function drawLink(pre, post) {
     push()
       strokeCap(SQUARE)
       strokeWeight(linkWidth)
-      if (pre.x < post.x) stroke(100, 255, 100)
+      if (isOrdered(pre,post)) stroke(100, 255, 100)
       else stroke(255, 0, 0)
       noFill()
       bezier(
@@ -103,6 +103,10 @@ function drawLink(pre, post) {
         b.x + 2, b.y
       )
     pop()
+}
+
+function isOrdered(pre, post) {
+  return pre.x + pre.w <= post.x
 }
 
 function update() {
@@ -117,7 +121,7 @@ function update() {
 }
 
 function applyOrderForce(pre, post) {
-  let attractionPoint = pre.x + pre.w
+  let attractionPoint = pre.x + pre.w + 10
   let force = (attractionPoint - post.x) * orderForce
   if (attractionPoint <= post.x)
     force *= orderDiscount
@@ -126,9 +130,9 @@ function applyOrderForce(pre, post) {
 }
 
 function applyEdgeForce(task) {
-  if (task.x < 0) {
+  if (task.x < 50) {
     task.v += edgeForce
-    task.x = 0
+    task.x = 50
   } else if (task.x + task.w > width) {
     task.v -= edgeForce
     task.x = width - task.w
