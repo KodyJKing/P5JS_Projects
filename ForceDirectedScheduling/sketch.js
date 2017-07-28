@@ -1,23 +1,58 @@
-var tasks, taskHeight, flagHeight, flagWidth, startHeight
-var orderForce = 0.05
-var friction = 0.97
+var tasks, startHeight
 
-function randColor() {
-  return [random(255), random(255), random(255)]
+var taskCount = 20
+
+var orderForce = 0.5
+var friction = 0.96
+var orderDiscount = 0.1
+var edgeForce = 0.1
+var asapForce = 0.05
+
+var stepsPerFrame = 10
+
+var taskHeight = 20
+var flagHeight = 15
+var flagWidth = 5
+var linkWidth = 2
+
+var minTaskWidth = 100
+var maxTaskWidth = 100
+
+var maxConnections = 3
+
+function randColor() { 
+  return [random(255), random(255), random(255)] 
+}
+
+function randomParents(j) {
+  let count = random(maxConnections) | 0
+  let parents = []
+  if (j + 1 == tasks.length) return parents
+  for (var i = 0; i< count; i++) {
+    let p = floor(random(j + 1, taskCount))
+    if (p >= taskCount) p = taskCount - 1
+    if (p == j || parents.indexOf(p) > -1) continue
+    parents.push(p)
+  }
+  return parents
+}
+
+function randomTask(i) {
+  return {
+      x: random(width), y: (random(-5, 10) | 0) * taskHeight,
+      v: 0, w: random(minTaskWidth, maxTaskWidth),
+      c: randColor(), parents: randomParents(i)
+    }
 }
 
 function setup() {
   createCanvas(1900, 480);
   tasks = []
-  for(let i = 0; i < 15; i++) tasks.push({x: random(width), v: 0, w: random(50, 100), c:randColor()})
-
-  taskHeight = 20
-  flagHeight = 15
-  flagWidth = 5
+  for(let i = 0; i < taskCount; i++) tasks.push(randomTask(i))
   startHeight = (height - taskHeight) / 2
 }
 
-function drawEdges(){
+function drawEdges() {
   line(0, 0, width - 1, 0);
   line(0, height - 1, width - 1, height - 1);
   line(0, 0, 0, height - 1);
@@ -25,37 +60,81 @@ function drawEdges(){
 }
 
 function draw() {
-  clear()
-  for(let i = 0; i < 5; i++) update()
-  for(var task of tasks) {
+  background(30,30,30)
+  for(let i = 0; i < stepsPerFrame; i++) update()
+  for(var task of tasks) drawTask(task)
+  drawEdges();
+}
+
+function drawTask(task) {
     push()
       noStroke()
       fill(task.c)
-      rect(task.x, startHeight, task.w, taskHeight)
-      rect(task.x, startHeight - flagHeight, flagWidth, flagHeight)
+      rect(task.x, task.y + startHeight, task.w, taskHeight)
+      rect(task.x, task.y + startHeight - flagHeight, flagWidth, flagHeight)
+      for (let p of task.parents) drawLink(tasks[p], task)
     pop()
+}
+
+function linkBase(task) {
+  return {
+    x: task.x,
+    y: task.y + startHeight - flagHeight
   }
-  drawEdges();
+}
+
+function drawLink(pre, post) {
+    let a = linkBase(pre)
+    let b = linkBase(post)
+    let mid = {
+      x: (a.x + b.x) / 2,
+      y: (a.y + b.y) / 2 - 100
+    }
+    push()
+      strokeCap(SQUARE)
+      strokeWeight(linkWidth)
+      if (pre.x < post.x) stroke(100, 255, 100)
+      else stroke(255, 0, 0)
+      noFill()
+      bezier(
+        a.x + 2, a.y,
+        a.x, mid.y,
+        b.x, mid.y,
+        b.x + 2, b.y
+      )
+    pop()
 }
 
 function update() {
   for (let i = 0; i < tasks.length; i++) {
     let task = tasks[i]
-    let pre = tasks[i - 1]
-    if (pre != null)
-      orderSpring(pre, task)
-    if (i == 0) {
-      task.x = 50
-    } else {
-      task.x += task.v
-      task.v *= friction
-    }
+    applyEdgeForce(task)
+    applyAsapForce(task)
+    for (var p of task.parents) applyOrderForce(tasks[p], task)
+    task.x += task.v
+    task.v *= friction
   }
 }
 
-function orderSpring(pre, post) {
+function applyOrderForce(pre, post) {
   let attractionPoint = pre.x + pre.w
   let force = (attractionPoint - post.x) * orderForce
+  if (attractionPoint <= post.x)
+    force *= orderDiscount
   post.v += force
   pre.v -= force
+}
+
+function applyEdgeForce(task) {
+  if (task.x < 0) {
+    task.v += edgeForce
+    task.x = 0
+  } else if (task.x + task.w > width) {
+    task.v -= edgeForce
+    task.x = width - task.w
+  } 
+}
+
+function applyAsapForce(task) {
+  task.v -= asapForce
 }
