@@ -1,27 +1,26 @@
 var tasks, startHeight
 
-var taskCount = 50
+var taskCount = 100
 
 var orderForce = 0.8
 var friction = 0.7
-var orderDiscount = 0.05
+var orderDiscount = 0.0
 var edgeForce = 0.1
-var asapForce = 0.05
+var asapForce = 0.1
 
-var stepsPerFrame = 10
+var stepsPerFrame = 100
 
 var taskHeight = 10
 var flagHeight = 15
 var flagWidth = 5
-var linkWidth = 2
-
+var linkWidth = 3
 var minTaskWidth = 50
-var maxTaskWidth = 100
+var maxTaskWidth = 200
 
 var maxConnections = 3
 
 function randColor() { 
-  return [random(100,255), random(100,255), random(100,255)] 
+  return [random(50,150), random(50,150), random(50,150)] 
 }
 
 function randomParents(j) {
@@ -39,31 +38,24 @@ function randomParents(j) {
 
 function randomTask(i) {
   return {
-      x: random(0), y: (random(-5, 10) | 0) * taskHeight * 2,
+      x: random(0), y: (random(-7, 12) | 0) * taskHeight * 2,
       v: 0, w: random(minTaskWidth, maxTaskWidth),
       c: randColor(), parents: randomParents(i)
     }
 }
 
 function setup() {
-  createCanvas(1900, 480);
+  createCanvas(1920, 480);
   tasks = []
   for(let i = 0; i < taskCount; i++) tasks.push(randomTask(i))
   startHeight = (height - taskHeight) / 2
-}
-
-function drawEdges() {
-  line(0, 0, width - 1, 0);
-  line(0, height - 1, width - 1, height - 1);
-  line(0, 0, 0, height - 1);
-  line(width - 1, 0, width - 1, height - 1);
 }
 
 function draw() {
   background(30,30,30)
   for(let i = 0; i < stepsPerFrame; i++) update()
   for(var task of tasks) drawTask(task)
-  drawEdges();
+  for(var task of tasks) drawLinks(task)
 }
 
 function drawTask(task) {
@@ -72,8 +64,11 @@ function drawTask(task) {
       fill(task.c)
       rect(task.x, task.y + startHeight, task.w, taskHeight)
       rect(task.x, task.y + startHeight - flagHeight, flagWidth, flagHeight)
-      for (let p of task.parents) drawLink(tasks[p], task)
     pop()
+}
+
+function drawLinks(task) {
+  for (let p of task.parents) drawLink(tasks[p], task)
 }
 
 function linkBase(task) {
@@ -93,7 +88,7 @@ function drawLink(pre, post) {
     push()
       strokeCap(SQUARE)
       strokeWeight(linkWidth)
-      if (isOrdered(pre,post)) stroke(100, 255, 100)
+      if (isOrdered(pre,post)) stroke(100, 255, 100, 30)
       else stroke(255, 0, 0)
       noFill()
       bezier(
