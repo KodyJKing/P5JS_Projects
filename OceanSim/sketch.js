@@ -13,7 +13,7 @@ function setup() {
     world.maxVelocity = 0.1
     let points = world.points
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 20; i++) {
         let jelly = bell(vec(random(width * 0.25, width * 0.75), random(height)), world)
         for (let pt of jelly.base) {
             let c = chain( add(pt.p, vec(0, 3)), world )
@@ -21,8 +21,9 @@ function setup() {
             world.updates.push( () => springForce(pt, c[0], d, 0.0004) )
         }
         let shift = random(100)
+        let shift2 = random(100)
         world.updates.push( () => {
-            for (let pt of jelly.pts) pt.bouyancy = Math.sin(performance.now() * 0.0001 + shift)
+            for (let pt of jelly.pts) pt.bouyancy = Math.sin(performance.now() * 0.0001 + shift) + (Math.sin(performance.now() * 0.002 + shift2) + 0.8) * 0.5
         } )
     }
 
