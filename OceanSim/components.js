@@ -7,7 +7,7 @@ function chain(p, world) {
         pts.push(pt)
     }
     world.updates.push( () => {
-        for (let i = 0; i < 3; i++) springForce(pts[i], pts[i + 1], 50, 0.0004)
+        for (let i = 0; i < 3; i++) springForce(pts[i], pts[i + 1], 20, 0.0004)
     } )
     world.renderers.push( () => {
         push()
