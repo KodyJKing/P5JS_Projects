@@ -34,7 +34,7 @@ function failPair(pairNum, side){
     pairs.pop();
     if(DEBUG){
       stroke(255, 0, 0);
-      line(pair.a.pos.x, pair.a.pos.y, pair.b.pos.x, pair.b.pos.y); 
+      line(pair.a.pos.x, pair.a.pos.y, pair.b.pos.x, pair.b.pos.y);
     }
   }
 }
