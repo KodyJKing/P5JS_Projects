@@ -6,6 +6,7 @@ class World {
         this.lastUpdate = performance.now()
         this.lastFrame = this.lastUpdate
         this.updatesAFrame = 1
+        this.maxVelocity = 0.5
         this.debug = false
     }
 
@@ -17,7 +18,8 @@ class World {
         for (let update of this.updates) update(dt)
         for (let point of this.points) {
             if (point.anchored) continue
-            point.v.add( mult(point.a, dt) )   
+            point.v.add( mult(point.a, dt / point.mass) )
+            clampVelocity(point, this.maxVelocity)
             point.p.add( mult(point.v, dt) )
             point.a.x = 0
             point.a.y = 0

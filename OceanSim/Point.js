@@ -3,6 +3,9 @@ class Point {
         this.p = vec(0, 0)
         this.v = vec(0, 0)
         this.a = vec(0, 0)
+        this.mass = 1
+        this.bouyancy = -1
+        this.charge = 1
         this.anchored = false
     }
 }

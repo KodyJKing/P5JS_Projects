@@ -10,15 +10,21 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
 
     world = new World()
-    // world.debug = true
+    world.maxVelocity = 0.1
     let points = world.points
 
-    let chains = []
-    for (let i = 0; i < 10; i++) 
-        chains.push( chain( vec(width / 2, height / 2), world ) )
-    for(let c of chains) c[0].anchored = true
-
-    // bell(vec(width / 2, height / 2), world)
+    for (let i = 0; i < 30; i++) {
+        let jelly = bell(vec(random(width * 0.25, width * 0.75), random(height)), world)
+        for (let pt of jelly.base) {
+            let c = chain( add(pt.p, vec(0, 3)), world )
+            let d = dist(pt.p, c[0].p)
+            world.updates.push( () => springForce(pt, c[0], d, 0.0004) )
+        }
+        let shift = random(100)
+        world.updates.push( () => {
+            for (let pt of jelly.pts) pt.bouyancy = Math.sin(performance.now() * 0.0001 + shift)
+        } )
+    }
 
     world.updates.push( () => {
 
@@ -28,49 +34,12 @@ function setup() {
 
         for (let pt of points) {
             gravity(pt, 0.001)
-            drag(pt, 0.98)
-            clampVelocity(pt, 0.5)
-            waves(pt, 0.001)
+            drag(pt, 0.95)
+            waves(pt, 0.002)
+            boundry(pt)
         }
 
+
     } )
 
 }
-
-function chain(p, world) {
-    let pts = []
-    for (let i = 0; i < 4; i++) {
-        let pt = new Point()
-        pt.p = add(p, random2D().mult(10))
-        world.points.push(pt)
-        pts.push(pt)
-    }
-    world.updates.push( () => {
-        for (let i = 0; i < 3; i++) springForce(pts[i], pts[i + 1], 50, 0.0004)
-    } )
-    world.renderers.push( () => {
-        push()
-        noFill()
-        strokeWeight(7)
-        strokeCap(SQUARE)
-        stroke(100, 255, 255, 100)
-        bezier(
-            pts[0].p.x, pts[0].p.y,
-            pts[1].p.x, pts[1].p.y,
-            pts[2].p.x, pts[2].p.y,
-            pts[3].p.x, pts[3].p.y,
-        )
-        noStroke()
-        fill(100, 100, 200, 100)
-        ellipse(pts[3].p.x, pts[3].p.y, 10)
-        pop()
-    } )
-    return pts
-}
-
-// function bell(p, world) {
-//     let res = 10
-//     for (let i = 0; i < res; i++) {
-
-//     }
-// }
