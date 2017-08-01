@@ -8,11 +8,12 @@ class World {
         this.updatesAFrame = 1
         this.maxVelocity = 0.5
         this.debug = false
+        this.fixedDt = undefined
     }
 
     update() {
         let currentTime = performance.now()
-        let dt = currentTime - this.lastUpdate
+        let dt = this.fixedDt || (currentTime - this.lastUpdate)
         this.lastUpdate = currentTime
 
         for (let update of this.updates) update(dt)

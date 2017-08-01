@@ -1,4 +1,4 @@
-function chain(p, world) {
+function stinger(p, world) {
     let pts = []
     for (let i = 0; i < 4; i++) {
         let pt = new Point()
@@ -34,7 +34,7 @@ function bell(p, world) {
     let pts = []
     let base = []
 
-    let res = 4
+    let res = 6
     for (let i = 0; i <= res; i++) {
 
         let pt = new Point()
@@ -100,11 +100,13 @@ function bell(p, world) {
         pop()
     } )
 
-    for (let i = 0; i < pts.length; i++) {
-        let a = pts[i]
-        let b = pts[(i + 3) % pts.length]
-        let d = dist(a.p, b.p)
-        world.updates.push( () => springForce(a, b, d + 5, 0.0008) )
+    for (let trussStride = 3; trussStride <= 4; trussStride++) {
+        for (let i = 0; i < pts.length; i++) {
+            let a = pts[i]
+            let b = pts[(i + trussStride) % pts.length]
+            let d = dist(a.p, b.p)
+            world.updates.push( () => springForce(a, b, d + 5, 0.0008) )
+        }
     }
 
     let center = new Point()
@@ -118,4 +120,18 @@ function bell(p, world) {
     world.points.push(center)
 
     return {base, pts}
+}
+
+function jellfish(p, world) {
+    let jelly = bell(p, world)
+    for (let pt of jelly.base) {
+        let s = stinger( add(pt.p, vec(0, 3)), world )
+        let d = dist(pt.p, s[0].p)
+        world.updates.push( () => springForce(pt, s[0], d, 0.0004) )
+    }
+    let shift = random(100)
+    let shift2 = random(100)
+    world.updates.push( () => {
+        for (let pt of jelly.pts) pt.bouyancy = Math.sin(performance.now() * 0.0001 + shift) + (Math.sin(performance.now() * 0.002 + shift2) + 0.8) * 0.5
+    } )
 }
