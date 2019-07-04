@@ -15,12 +15,22 @@ class Circle {
 
   drawVivid(){
     push();
-    var color = colors[random(0, colors.length) | 0];
+    // var color = colors[random(0, colors.length) | 0];
 
-    fill(color[0], color[1], color[2]);
+    let pixels = imgData.data
+    let index = ( ( this.pos.y | 0 ) * width + (this.pos.x | 0)) * 4
+    let color = [
+      pixels[index],
+      pixels[index + 1],
+      pixels[index + 2]
+    ]
+
+    // fill( color[0], color[1], color[2] );
+    fill( color[0] * 0.7, color[1] * 0.7, color[2] * 0.7 );
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.radius * 2);
-    fill(color[0] * 0.7, color[1] * 0.7, color[2] * 0.7);
+    // fill(color[0] * 0.7, color[1] * 0.7, color[2] * 0.7);
+    fill( color[0], color[1], color[2] );
     ellipse(this.pos.x, this.pos.y, this.radius * 1.5);
     pop();
   }
