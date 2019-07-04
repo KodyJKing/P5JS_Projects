@@ -10,10 +10,10 @@ var DEBUG = false
 var imageData
 var detailInfo
 
-var r = 1
-var R = 200
+var r = 2 //1
+var R = 400 //200
 
-var imageScale = 1
+var imageScale = 2
 var entropyTolerance = 2
 var magnetism = 1.01
 

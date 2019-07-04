@@ -1,4 +1,4 @@
-var maxFails = 3
+var maxFails = 0
 var pairs = []
 
 class Pair {
