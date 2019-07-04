@@ -23,7 +23,7 @@ var bg = 100
 
 function setup() {
     createCanvas( img.width * imageScale, img.height * imageScale )
-    background( bg)
+    background( bg )
     noFill()
 
     initImage()
@@ -43,6 +43,7 @@ function setup() {
 }
 
 function initImage() {
+    img.crossorigin = ""
     let canvas = document.createElement( "canvas" )
     canvas.width = width
     canvas.height = height
@@ -66,13 +67,13 @@ function initCgrad() {
             let k = ( y * width + x + 1 ) * 4
 
             for ( let c = 0; c < 3; c++ ) {
-                if (y < height - 1)
-                    sum += ( pixels[i + c] - pixels[j + c] ) ** 2
-                if (x < width - 1)
-                    sum += ( pixels[i + c] - pixels[k + c] ) ** 2
+                if ( y < height - 1 )
+                    sum += ( pixels[ i + c ] - pixels[ j + c ] ) ** 2
+                if ( x < width - 1 )
+                    sum += ( pixels[ i + c ] - pixels[ k + c ] ) ** 2
             }
 
-            cgrad[i / 4] = sum
+            cgrad[ i / 4 ] = sum
         }
     }
 
@@ -80,19 +81,19 @@ function initCgrad() {
         let sum = 0
         for ( let y = 0; y < height; y++ ) {
             let i = y * width + x
-            sum += cgrad[i]
-            cgrad[i] = sum
+            sum += cgrad[ i ]
+            cgrad[ i ] = sum
         }
     }
 }
 
 function getCgrad( x, y ) {
     x = Math.max( 0, Math.min( x, width - 1 ) )
-    y = Math.max( 0, Math.min( y, height - 1) )
-    return cgrad[y * width + x]
+    y = Math.max( 0, Math.min( y, height - 1 ) )
+    return cgrad[ y * width + x ]
 }
 
-function sumGrad(x, y, r) {
+function sumGrad( x, y, r ) {
     let a = getCgrad( x + r, y + r )
     let b = getCgrad( x - r, y + r )
     let c = getCgrad( x + r, y - r )
@@ -165,13 +166,13 @@ function entropy( pos, radius ) {
                 let y = Math.round( pos.y ) + dy
                 let index = ( y * width + x ) * 4
 
-                redAv += pixels[index]
-                greenAv += pixels[index + 1]
-                blueAv += pixels[index + 2]
+                redAv += pixels[ index ]
+                greenAv += pixels[ index + 1 ]
+                blueAv += pixels[ index + 2 ]
 
-                redSqAv += pixels[index] ** 2
-                greenSqAv += pixels[index + 1] ** 2
-                blueSqAv += pixels[index + 2] ** 2
+                redSqAv += pixels[ index ] ** 2
+                greenSqAv += pixels[ index + 1 ] ** 2
+                blueSqAv += pixels[ index + 2 ] ** 2
             }
         }
 
@@ -192,14 +193,14 @@ function entropy( pos, radius ) {
 
     let x = Math.round( pos.x )
     let y = Math.round( pos.y )
-    let r = Math.round(radius)
+    let r = Math.round( radius )
 
-    return sumGrad(x, y, r)
+    return sumGrad( x, y, r )
 }
 
 function generateCircle() {
     var pairNum = random( 0, pairs.length ) | 0
-    var pair = pairs[pairNum]
+    var pair = pairs[ pairNum ]
     var side = pair.pickSide()
     var radius = random( mr, R ) + 1
 
@@ -209,9 +210,9 @@ function generateCircle() {
         if ( radius < r )
             break
 
-        pair = pairs[pairNum];
+        pair = pairs[ pairNum ];
         var n = neighborCircles( radius, pair.a, pair.b )
-        var circle = n[side]
+        var circle = n[ side ]
 
         let e = entropy( circle.pos, circle.radius )
         // console.log(e)
